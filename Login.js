@@ -27,9 +27,6 @@ const checkCredentials = async (username, password) => {
   console.log('Entered username:', username);
   console.log('Entered password:', password);
 
-  // Replace this with your own code to check the user's credentials
-  // For example, you could fetch the user data from your API and compare the entered password with the hashed password stored in your database
-
   // For this example, we will use a hardcoded username and password
   const validUsername = 'admin';
   const hashedPassword = '$2a$10$pssfS1MuV06RuUAJpdqvNuwKBoi4C5/ficdOtD7fiRzmMdf24wI0.';// 'password'
