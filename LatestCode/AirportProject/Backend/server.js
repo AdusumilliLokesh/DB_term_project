@@ -15,7 +15,9 @@ const dbConfig = {
 
 const pool = mysql.createPool(dbConfig);
 
-app.use(cors());
+app.use(cors(
+
+));
 app.use(express.json()); 
 
 app.post('/login', async (req, res) => {

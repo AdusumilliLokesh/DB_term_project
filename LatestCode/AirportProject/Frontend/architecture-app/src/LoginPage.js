@@ -3,23 +3,37 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import './LoginPage.css';
 
-function LoginPage({ onLoginSuccess }) {
+function LoginPage({ setIsLoggedIn }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleLogin = () => {
-        axios.post('/login', {
-            username,
-            password
-        }).then(res => {
-            if (res.data.success) {
-                onLoginSuccess();
-            } else {
-                // handle failed login
-            }
-        }).catch(err => {
-            // handle error
-        });
+    const handleLogin = (event) => {
+        event.preventDefault();
+    const data = {
+        "username": username,
+        "password":password
+    };
+    const apiUrl = 'http://localhost:5000/login';
+
+    // Optional: Headers for the request (e.g., if you need to send an authorization token)
+    const headers = {
+      'Content-Type': 'application/json',
+      // Add any other required headers here
+    };
+    
+    // Make the POST request using Axios
+    axios.post(apiUrl, data, { headers })
+      .then((response) => {
+        // Process the response data
+        setIsLoggedIn(true);
+        // Do something with the data, if needed
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        // Handle any errors that occurred during the request
+      });
+    
+
     }
 
     return (
@@ -46,4 +60,4 @@ function LoginPage({ onLoginSuccess }) {
     );
 }
 
-export default LoginPage;
+export {LoginPage};
