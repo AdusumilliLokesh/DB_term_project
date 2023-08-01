@@ -28,6 +28,8 @@ const ModelsData = ({ children }) => {
   const [Last_Maintenance_Date, setLast_Maintenance_Date] = useState();
   const [Maintenance_Status, setMaintenance_Status] = useState();
   const [Registration_number, setRegistration_number] = useState();
+  const [owner_id    , setowner_id  ] = useState();
+  const [Purchase_date    , setPurchase_date  ] = useState();
   const handleEdit = (id) => {
     // Implement your edit logic here
     console.log('Edit item with ID:', id);
@@ -37,6 +39,8 @@ const ModelsData = ({ children }) => {
     setLast_Maintenance_Date(id.Last_Maintenance_Date);
     setMaintenance_Status(id.Maintenance_Status);
     setRegistration_number(id.Registration_number);
+    setowner_id(id.owner_id);
+    setPurchase_date(id.Purchase_date);
     setEdit(true);
     setAdd(false);
   };
@@ -87,6 +91,8 @@ const ModelsData = ({ children }) => {
     setLast_Maintenance_Date('');
     setMaintenance_Status('');
     setRegistration_number('');
+    setPurchase_date('');
+    setowner_id('');
     console.log('Add item with ID:', id);
   };
   const handleChangeManufacturer = (event) => {
@@ -97,6 +103,12 @@ const ModelsData = ({ children }) => {
   };
   const handleApron_number = (event) => {
     setApronNumber(event.target.value);
+  };
+  const handlePurchase_date  = (event) => {
+    setPurchase_date    (event.target.value);
+  };
+  const handleowner_id  = (event) => {
+    setowner_id (event.target.value);
   };
   const handleLast_Maintenance_Date = (event) => {
     setLast_Maintenance_Date(event.target.value);
@@ -123,6 +135,12 @@ const ModelsData = ({ children }) => {
   const handleRegistration_numberAdd = (event) => {
     setRegistration_number(event.target.value);
   };
+  const handleowner_idAdd = (event) => {
+    setowner_id(event.target.value);
+  };
+  const handlePurchase_dateAdd = (event) => {
+    setPurchase_date(event.target.value);
+  };
   const handleSubmit = (event) => {
     //setcapacity(event.target.value);
 
@@ -138,7 +156,8 @@ const ModelsData = ({ children }) => {
       "Manufacturer": Manufacturer,
       "Apron_number": ApronNumber,
       "Maintenance_Status": Maintenance_Status,
-      "Last_Maintenance_Date": Last_Maintenance_Date
+      "Last_Maintenance_Date": Last_Maintenance_Date,
+      "Purchase_date":Purchase_date
     };
     const apiUrl = 'http://localhost:5000/airplanes/' + Registration_number;
 
@@ -178,7 +197,8 @@ const ModelsData = ({ children }) => {
       "Manufacturer": Manufacturer,
       "Apron_number": ApronNumber,
       "Maintenance_Status": Maintenance_Status,
-      "Last_Maintenance_Date": Last_Maintenance_Date
+      "Last_Maintenance_Date": Last_Maintenance_Date,
+      "Purchase_date":Purchase_date
     };
     const apiUrl = 'http://localhost:5000/airplanes';
 
@@ -215,7 +235,7 @@ const ModelsData = ({ children }) => {
   const [searchBox, setSearchBox] = useState('');
   // Options for the dropdown
   const dropdownOptions = ['Registration_number', 'Manufacturer', 'Model','Apron_number','Last_Maintenance_Date',
-'Maintenance_Status'];
+'Maintenance_Status','owner_id'];
   const handleSearchChange = (query) => {
     setSearchBox(query);
   };
@@ -261,7 +281,7 @@ const ModelsData = ({ children }) => {
   return (
     <div>
       <div className='align_table'>
-        <h1>Models Data
+        <h1>Plane Services
           <RiAddLine
             onClick={() => handleAdd(123)}
             style={{ cursor: 'pointer', marginRight: '10px' }}
@@ -304,6 +324,8 @@ const ModelsData = ({ children }) => {
               <th className="modelheader">Apron Number</th>
               <th className="modelheader">Last_Maintenance_Date</th>
               <th className="modelheader">Maintenance_Status</th>
+              <th className="modelheader">owner_id</th>
+              <th className="modelheader">Purchase_date</th>
               <th className="modelheader">Actions</th>
             </tr>
           </thead>
@@ -316,6 +338,8 @@ const ModelsData = ({ children }) => {
                 <td className="modelcell">{model.Apron_number}</td>
                 <td className="modelcell">{model.Last_Maintenance_Date}</td>
                 <td className="modelcell">{model.Maintenance_Status}</td>
+                <td className="modelcell">{model.owner_id}</td>
+                <td className="modelcell">{model.Purchase_date}</td>
                 <td className="aproncell">
                   <span>
                     <RiEdit2Line
@@ -385,6 +409,20 @@ const ModelsData = ({ children }) => {
                 <input type="text" value={Maintenance_Status} onChange={handleMaintenance_Status} className='floatright'/>
               
             </div>
+            <div className='form-group'>
+              
+
+                <div className='floatleft'>owner_id:</div>
+                <input type="text" value={owner_id} onChange={handleowner_id} className='floatright'/>
+              
+            </div>
+            <div className='form-group'>
+              
+
+                <div className='floatleft'>Purchase_date:</div>
+                <input type="text" value={Purchase_date} onChange={handlePurchase_date} className='floatright'/>
+              
+            </div>
             <div><button type="submit" onClick={useHandleSave}>Save</button></div>
           </form>
         ) : null}
@@ -428,6 +466,18 @@ const ModelsData = ({ children }) => {
               <input type="text" value={Maintenance_Status} onChange={handleMaintenance_StatusAdd} className='floatright'/>
 
             </div>
+            <div className='form-group'>
+
+<div className='floatleft'>owner_id:</div>
+<input type="text" value={owner_id} onChange={handleowner_idAdd} className='floatright'/>
+
+</div>
+<div className='form-group'>
+
+<div className='floatleft'>Purchase_date:</div>
+<input type="text" value={Purchase_date} onChange={handlePurchase_dateAdd} className='floatright'/>
+
+</div>
             <div><button type="submit" onClick={useHandleSaveAdd}>Save</button></div>
           </form>
           : null}

@@ -43,6 +43,8 @@ const AirplaneSearch = ({res}) => {
                             <th className="planeheader">Apron_number</th>
                             <th className="planeheader">Maintenance_Status</th>
                             <th className="planeheader">Last_Maintenance_Date</th>
+                            <th className="planeheader">Purchase_date</th>
+                            <th className="planeheader">owner_id</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -54,6 +56,8 @@ const AirplaneSearch = ({res}) => {
                                 <td className="planecell">{Airplane.Apron_number}</td>
                                 <td className="planecell">{Airplane.Maintenance_Status}</td>
                                 <td className="planecell">{Airplane.Last_Maintenance_Date}</td>
+                                <td className="planecell">{Airplane.Purchase_date}</td>
+                                <td className="planecell">{Airplane.owner_id}</td>
                             </tr>
                         ))}
                     </tbody>

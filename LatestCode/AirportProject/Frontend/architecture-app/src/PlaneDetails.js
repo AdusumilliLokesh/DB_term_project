@@ -213,7 +213,7 @@ const PlaneDetails = ({ children }) => {
         <div>
             <div className='align_table'>
             <div>
-                <h1>Planes Data
+                <h1>Models Data
                 <RiAddLine
                             onClick={() => handleAdd(123)}
                             style={{ cursor: 'pointer', marginRight: '10px' }}

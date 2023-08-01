@@ -84,7 +84,7 @@ app.get('/getAirplane', async (req, res) => {
 app.get('/getOwner', async (req, res) => { 
   try {
     const connection = await pool.getConnection();
-    const [rows] = await connection.query('SELECT * FROM owns;');
+    const [rows] = await connection.query('SELECT * FROM owner;');
     connection.release();
     res.json(rows);
   } catch (err) {
@@ -118,7 +118,7 @@ app.post('/searchAirplaneByRegistration', async (req, res) => {
 
     const [airplaneRows] = await connection.query('SELECT * FROM airplane WHERE Registration_Number = ?;', [regNumber]);
 
-    const [ownsRows] = await connection.query('SELECT * FROM owns WHERE Registration_number = ?;', [regNumber]);
+    const [ownsRows] = await connection.query('SELECT * FROM owner WHERE owner_id = ?;', airplaneRows[0].owner_id);
 
     if (airplaneRows.length === 0) {
       connection.release();
@@ -170,7 +170,7 @@ app.post('/searchAirplaneByRegistration', async (req, res) => {
 
 app.put('/airplanes/:registration_number', async (req, res) => {
   const registrationNumber = req.params.registration_number;
-  const { Model, Manufacturer, Apron_number, Maintenance_Status, Last_Maintenance_Date } = req.body;
+  const { Model, Manufacturer, Apron_number, owner_id, Maintenance_Status, Last_Maintenance_Date, Purchase_date } = req.body;
 
   try {
     const connection = await pool.getConnection();
@@ -189,9 +189,16 @@ app.put('/airplanes/:registration_number', async (req, res) => {
       return res.status(400).json({ error: 'Invalid Apron_number provided. Apron_number does not exist in airport_apron table.' });
     }
 
-    const query = `UPDATE airplane SET Model = ?, Manufacturer = ?, Apron_number = ?, Maintenance_Status = ?, Last_Maintenance_Date = ? WHERE Registration_number = ?`;
+    const checkOwnerQuery = 'SELECT * FROM owner WHERE owner_id = ?';
+    const [ownerRows] = await connection.query(checkOwnerQuery, [owner_id]);
+    if (ownerRows.length === 0) {
+      connection.release();
+      return res.status(400).json({ error: 'Invalid owner_id provided. owner_id does not exist in owner table.' });
+    }
 
-    const values = [Model, Manufacturer, Apron_number, Maintenance_Status, Last_Maintenance_Date, registrationNumber];
+    const query = `UPDATE airplane SET Model = ?, Manufacturer = ?, Apron_number = ?, owner_id = ?, Maintenance_Status = ?, Last_Maintenance_Date = ?, Purchase_date = ? WHERE Registration_number = ?`;
+
+    const values = [Model, Manufacturer, Apron_number, owner_id, Maintenance_Status, Last_Maintenance_Date, Purchase_date, registrationNumber];
 
     await connection.query(query, values);
     connection.release();
@@ -202,6 +209,7 @@ app.put('/airplanes/:registration_number', async (req, res) => {
     res.status(500).json({ error: 'An error occurred while updating the airplane.' });
   }
 });
+
 
 
 app.put('/airport_aprons/:apron_number', async (req, res) => {
@@ -247,25 +255,33 @@ app.put('/type_of_planes/:model', async (req, res) => {
   }
 });
 
-app.put('/owns/:owner_id/:registration_number', async (req, res) => {
+
+app.put('/owns/:owner_id', async (req, res) => {
   const ownerId = req.params.owner_id;
-  const registrationNumber = req.params.registration_number;
-  const { Purchase_date } = req.body;
+  const {
+    Name,
+    Street,
+    State,
+    City,
+    Zip,
+    Phone_No,
+    Type_of_owner
+  } = req.body;
 
   try {
     const connection = await pool.getConnection();
-    const query = `UPDATE owns 
-                   SET Purchase_date = ? 
-                   WHERE owner_id = ? AND Registration_number = ?`;
+    const query = `UPDATE owner 
+                   SET Name = ?, Street = ?, State = ?, City = ?, Zip = ?, Phone_No = ?, Type_of_owner = ? 
+                   WHERE owner_id = ?`;
 
-    const values = [Purchase_date, ownerId, registrationNumber];
+    const values = [Name, Street, State, City, Zip, Phone_No, Type_of_owner, ownerId];
 
     await connection.query(query, values);
     connection.release();
-    res.status(200).json({ message: 'Owns table updated successfully.' });
+    res.status(200).json({ message: 'Owner table updated successfully.' });
   } catch (err) {
-    console.error('Error updating owns table:', err);
-    res.status(500).json({ error: 'An error occurred while updating the owns table.' });
+    console.error('Error updating owner table:', err);
+    res.status(500).json({ error: 'An error occurred while updating the owner table.' });
   }
 });
 
@@ -365,15 +381,14 @@ app.delete('/employees/:employee_id', async (req, res) => {
   }
 });
 
-app.delete('/owns/:owner_id/:registration_number', async (req, res) => {
+app.delete('/owns/:owner_id', async (req, res) => {
   const ownerId = req.params.owner_id;
-  const registrationNumber = req.params.registration_number;
 
   try {
     const connection = await pool.getConnection();
-    const query = `DELETE FROM owns WHERE owner_id = ? AND Registration_number = ?`;
+    const query = `DELETE FROM owner WHERE owner_id = ?`;
 
-    const result = await connection.query(query, [ownerId, registrationNumber]);
+    const result = await connection.query(query, [ownerId]);
     connection.release();
 
     if (result.affectedRows === 0) {
@@ -387,7 +402,7 @@ app.delete('/owns/:owner_id/:registration_number', async (req, res) => {
   }
 });
 app.post('/airplanes', async (req, res) => {
-  const { Registration_number, Model, Manufacturer, Apron_number, Maintenance_Status, Last_Maintenance_Date } = req.body;
+  const { Registration_number, Model, Manufacturer, Apron_number, owner_id, Maintenance_Status, Last_Maintenance_Date, Purchase_date } = req.body;
 
   try {
     const connection = await pool.getConnection();
@@ -406,8 +421,15 @@ app.post('/airplanes', async (req, res) => {
       return res.status(400).json({ error: 'Invalid Apron_number provided. Apron_number does not exist in airport_apron table.' });
     }
 
-    const insertQuery = `INSERT INTO airplane (Registration_number, Model, Manufacturer, Apron_number, Maintenance_Status, Last_Maintenance_Date) VALUES (?, ?, ?, ?, ?, ?)`;
-    const values = [Registration_number, Model, Manufacturer, Apron_number, Maintenance_Status, Last_Maintenance_Date];
+    const checkOwnerQuery = 'SELECT * FROM owner WHERE owner_id = ?';
+    const [ownerRows] = await connection.query(checkOwnerQuery, [owner_id]);
+    if (ownerRows.length === 0) {
+      connection.release();
+      return res.status(400).json({ error: 'Invalid owner_id provided. owner_id does not exist in owner table.' });
+    }
+
+    const insertQuery = `INSERT INTO airplane (Registration_number, Model, Manufacturer, Apron_number, owner_id, Maintenance_Status, Last_Maintenance_Date, Purchase_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+    const values = [Registration_number, Model, Manufacturer, Apron_number, owner_id, Maintenance_Status, Last_Maintenance_Date, Purchase_date];
 
     await connection.query(insertQuery, values);
     connection.release();
@@ -418,6 +440,7 @@ app.post('/airplanes', async (req, res) => {
     res.status(500).json({ error: 'An error occurred while inserting the airplane.' });
   }
 });
+
 
 app.post('/airport_apron', async (req, res) => {
   const { Apron_number, Apron_type, Aircraft_Capacity, Apron_status } = req.body;
@@ -476,37 +499,24 @@ app.post('/employees', async (req, res) => {
 });
 
 app.post('/owns', async (req, res) => {
-  const { owner_id, Registration_number, Purchase_date } = req.body;
+  const { owner_id, Name, Street, State, City, Zip, Phone_No, Type_of_owner } = req.body;
 
   try {
     const connection = await pool.getConnection();
 
-    const checkOwnerQuery = 'SELECT * FROM owner WHERE owner_id = ?';
-    const [ownerRows] = await connection.query(checkOwnerQuery, [owner_id]);
-    if (ownerRows.length === 0) {
-      connection.release();
-      return res.status(400).json({ error: 'Invalid owner_id provided. owner_id does not exist in owner table.' });
-    }
-
-    const checkAirplaneQuery = 'SELECT * FROM airplane WHERE Registration_number = ?';
-    const [airplaneRows] = await connection.query(checkAirplaneQuery, [Registration_number]);
-    if (airplaneRows.length === 0) {
-      connection.release();
-      return res.status(400).json({ error: 'Invalid Registration_number provided. Registration_number does not exist in airplane table.' });
-    }
-
-    const insertQuery = `INSERT INTO owns (owner_id, Registration_number, Purchase_date) VALUES (?, ?, ?)`;
-    const values = [owner_id, Registration_number, Purchase_date];
+    const insertQuery = `INSERT INTO owner (owner_id, Name, Street, State, City, Zip, Phone_No, Type_of_owner) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+    const values = [owner_id, Name, Street, State, City, Zip, Phone_No, Type_of_owner];
 
     await connection.query(insertQuery, values);
     connection.release();
 
-    res.status(201).json({ message: 'Ownership record inserted successfully.' });
+    res.status(201).json({ message: 'Owner record inserted successfully.' });
   } catch (err) {
-    console.error('Error inserting ownership record:', err);
-    res.status(500).json({ error: 'An error occurred while inserting the ownership record.' });
+    console.error('Error inserting owner record:', err);
+    res.status(500).json({ error: 'An error occurred while inserting the owner record.' });
   }
 });
+
 app.post('/search/airport_apron', async (req, res) => {
   const { column, value } = req.body;
 
@@ -555,25 +565,24 @@ app.post('/search/airplane', async (req, res) => {
       searchQuery += 'Registration_number = ?  ';
       queryParams.push(parseInt(value));
     } else if (column === 'Model') {
-      searchQuery += 'Model IN (?)  ';
-      queryParams.push(value);
+      searchQuery += 'Model LIKE ?  ';
+      queryParams.push(`%${value}%`);
     } else if (column === 'Manufacturer') {
       searchQuery += 'Manufacturer LIKE ?  ';
       queryParams.push(`%${value}%`);
     } else if (column === 'Apron_number') {
-      searchQuery += 'Apron_number IN (?)  ';
+      searchQuery += 'Apron_number = ?  ';
       queryParams.push(parseInt(value));
     } else if (column === 'Maintenance_Status') {
       searchQuery += 'Maintenance_Status LIKE ?  ';
       queryParams.push(`%${value}%`);
     } else if (column === 'Last_Maintenance_Date') {
-      searchQuery += 'Last_Maintenance_Date IN (?)  ';
+      searchQuery += 'Last_Maintenance_Date = ?  ';
       queryParams.push(value);
     } else {
       connection.release();
       return res.status(400).json({ error: 'Invalid column name. Please provide a valid column name.' });
     }
-
 
     const [rows] = await connection.query(searchQuery, queryParams);
     connection.release();
@@ -588,6 +597,7 @@ app.post('/search/airplane', async (req, res) => {
     res.status(500).json({ error: 'An error occurred while searching the airplane table.' });
   }
 });
+
 
 app.post('/search/typeOfPlane', async (req, res) => {
   const { column, value } = req.body;
@@ -630,28 +640,42 @@ app.post('/search/typeOfPlane', async (req, res) => {
     res.status(500).json({ error: 'An error occurred while searching the type_of_plane table.' });
   }
 });
-app.post('/search/owns', async (req, res) => {
+app.post('/search/owners', async (req, res) => {
   const { column, value } = req.body;
 
   try {
     const connection = await pool.getConnection();
-    let searchQuery = 'SELECT * FROM owns WHERE ';
+    let searchQuery = 'SELECT * FROM owner WHERE ';
 
     const queryParams = [];
     if (column === 'owner_id') {
-      searchQuery += 'owner_id IN (?)  ';
+      searchQuery += 'owner_id = ?  ';
       queryParams.push(parseInt(value));
-    } else if (column === 'Registration_number') {
-      searchQuery += 'Registration_number IN (?)  ';
+    } else if (column === 'Name') {
+      searchQuery += 'Name LIKE ?  ';
+      queryParams.push(`%${value}%`);
+    } else if (column === 'Street') {
+      searchQuery += 'Street LIKE ?  ';
+      queryParams.push(`%${value}%`);
+    } else if (column === 'State') {
+      searchQuery += 'State LIKE ?  ';
+      queryParams.push(`%${value}%`);
+    } else if (column === 'City') {
+      searchQuery += 'City LIKE ?  ';
+      queryParams.push(`%${value}%`);
+    } else if (column === 'Zip') {
+      searchQuery += 'Zip LIKE ?  ';
+      queryParams.push(`%${value}%`);
+    } else if (column === 'Phone_No') {
+      searchQuery += 'Phone_No = ?  ';
       queryParams.push(parseInt(value));
-    } else if (column === 'Purchase_date') {
-      searchQuery += 'Purchase_date IN (?)  ';
-      queryParams.push(value);
+    } else if (column === 'Type_of_owner') {
+      searchQuery += 'Type_of_owner LIKE ?  ';
+      queryParams.push(`%${value}%`);
     } else {
       connection.release();
       return res.status(400).json({ error: 'Invalid column name. Please provide a valid column name.' });
     }
-
 
     const [rows] = await connection.query(searchQuery, queryParams);
     connection.release();
@@ -662,10 +686,11 @@ app.post('/search/owns', async (req, res) => {
 
     res.json(rows);
   } catch (err) {
-    console.error('Error searching owns:', err);
-    res.status(500).json({ error: 'An error occurred while searching the owns table.' });
+    console.error('Error searching owners:', err);
+    res.status(500).json({ error: 'An error occurred while searching the owners table.' });
   }
 });
+
 app.post('/search/employee', async (req, res) => {
   const { column, value } = req.body;
 

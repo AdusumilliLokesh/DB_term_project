@@ -54,12 +54,12 @@ const Details = ({showContent,res}) => {
             <ApronDetails></ApronDetails>
           </div>
         </VerticalTab>
-        <VerticalTab label="Models">
+        <VerticalTab label="Plane Services">
           <div>
             <ModelsData></ModelsData>
           </div>
         </VerticalTab>
-        <VerticalTab label="Plane Details">
+        <VerticalTab label="Models">
           <div>
             <PlaneDetails></PlaneDetails>
           </div>

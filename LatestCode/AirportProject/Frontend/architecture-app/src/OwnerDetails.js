@@ -23,22 +23,32 @@ const OwnerDetails = ({ children }) => {
         setCurrentPage(pageNumber);
     };
     const [owner_id, setowner_id] = useState();
-    const[Registration_number,setRegistration_number]=useState();
-    const[Purchase_date,setPurchase_date]=useState();
+    const[City,setCity]=useState();
+    const[Name,setName]=useState();
+    const[Phone_No,setPhone_No]=useState();
+    const[State,setState]=useState();
+    const[Street,setStreet]=useState();
+    const[Type_of_owner,setType_of_owner]=useState();
+    const[Zip,setZip]=useState();
     const handleEdit = (id) => {
         // Implement your edit logic here
         console.log('Edit item with ID:', id);
         setEdit(true);
         setowner_id(id.owner_id);
-        setRegistration_number(id.Registration_number);
-        setPurchase_date(id.Purchase_date);
+        setCity(id.City);
+        setName(id.Name);
+        setPhone_No(id.Phone_No);
+        setState(id.State);
+        setStreet(id.Street);
+        setType_of_owner(id.Type_of_owner);
+        setZip(id.Zip);
         setAdd(false);
     };
 
     const handleDelete = (id,event) => {
       event.preventDefault();
         
-      const apiUrl = 'http://localhost:5000/owns/' + owner_id+"/"+Registration_number;
+      const apiUrl = 'http://localhost:5000/owns/' + owner_id;
   
       // Optional: Headers for the request (e.g., if you need to send an authorization token)
       const headers = {
@@ -76,36 +86,77 @@ const OwnerDetails = ({ children }) => {
         setAdd(true);
         setEdit(false);
         setowner_id('');
-        setRegistration_number('');
-        setPurchase_date('');
+        setCity('');
+        setName('');
+        setPhone_No('');
+        setState('');
+        setStreet('');
+        setType_of_owner('');
+        setZip('');
         console.log('Add item with ID:', id);
     };
     
   const handleowner_id = (event) => {
     setowner_id(event.target.value);
   };
-  const handleRegistration_number = (event) => {
-    setRegistration_number(event.target.value);
+  const handleCity = (event) => {
+    setCity(event.target.value);
   };
-  const handlePurchase_date = (event) => {
-    setPurchase_date(event.target.value);
+  const handleName = (event) => {
+    setName(event.target.value);
+  };
+  const handlePhone_No = (event) => {
+    setPhone_No(event.target.value);
+  };
+  const handleState = (event) => {
+    setState(event.target.value);
+  };
+  const handleStreet = (event) => {
+    setStreet(event.target.value);
+  };
+  const handleType_of_owner = (event) => {
+    setType_of_owner(event.target.value);
+  };
+  const handleZip = (event) => {
+    setZip(event.target.value);
   };
   const handleowner_idAdd = (event) => {
     setowner_id(event.target.value);
   };
-  const handleRegistration_numberAdd = (event) => {
-    setRegistration_number(event.target.value);
+  const handleCityAdd = (event) => {
+    setCity(event.target.value);
   };
-  const handlePurchase_dateAdd = (event) => {
-    setPurchase_date(event.target.value);
+  const handleNameAdd = (event) => {
+    setName(event.target.value);
+  };
+  const handlePhone_NoAdd = (event) => {
+    setPhone_No(event.target.value);
+  };
+  const handleStateAdd = (event) => {
+    setState(event.target.value);
+  };
+  const handleStreetAdd = (event) => {
+    setStreet(event.target.value);
+  };
+  const handleType_of_ownerAdd = (event) => {
+    setType_of_owner(event.target.value);
+  };
+  const handleZipAdd = (event) => {
+    setZip(event.target.value);
   };
   const handleSubmit = (event) => {
     //setcapacity(event.target.value);
     event.preventDefault();
     const data = {
-      "Purchase_date": Purchase_date
+      "City": City,
+      "Name":Name,
+      "Phone_No":Phone_No,
+      "State":State,
+      "Street":Street,
+      "Type_of_owner":Type_of_owner,
+      "Zip":Zip
     };
-    const apiUrl = 'http://localhost:5000/owns/' + owner_id+"/"+Registration_number;
+    const apiUrl = 'http://localhost:5000/owns/' + owner_id;
 
     // Optional: Headers for the request (e.g., if you need to send an authorization token)
     const headers = {
@@ -140,8 +191,13 @@ const OwnerDetails = ({ children }) => {
     event.preventDefault();
     const data = {
       "owner_id": owner_id,
-  "Registration_number": Registration_number,
-  "Purchase_date": Purchase_date
+      "City": City,
+      "Name":Name,
+      "Phone_No":Phone_No,
+      "State":State,
+      "Street":Street,
+      "Type_of_owner":Type_of_owner,
+      "Zip":Zip
     };
     const apiUrl = 'http://localhost:5000/owns';
 
@@ -178,7 +234,7 @@ const OwnerDetails = ({ children }) => {
   };
   const [searchBox, setSearchBox] = useState('');
   // Options for the dropdown
-  const dropdownOptions = ['Apron_number', 'Aircraft_Capacity', 'Apron_status','Apron_type'];
+  const dropdownOptions = ['owner_id', 'City', 'Name','Phone_No ','State','Street','Type_of_owner','Zip'];
   const handleSearchChange = (query) => {
     setSearchBox(query);
   };
@@ -262,8 +318,13 @@ const OwnerDetails = ({ children }) => {
                     <thead>
                         <tr>
                             <th className="ownerheader">Owner ID</th>
-                            <th className="ownerheader">Registration Number</th>
-                            <th className="ownerheader">Purchase Date</th>
+                            <th className="ownerheader">City</th>
+                            <th className="ownerheader">Name</th>
+                            <th className="ownerheader">Phone_No</th>
+                            <th className="ownerheader">State</th>
+                            <th className="ownerheader">Street</th>
+                            <th className="ownerheader">Type_of_owner</th>
+                            <th className="ownerheader">Zip</th>
                             <th className="ownerheader">Actions</th>
                            
                         </tr>
@@ -272,8 +333,13 @@ const OwnerDetails = ({ children }) => {
                         {currentItems.map((owner, index) => (
                             <tr key={index}>
                                 <td className="ownercell">{owner.owner_id}</td>
-                                <td className="ownercell">{owner.Registration_number}</td>
-                                <td className="ownercell">{owner.Purchase_date}</td>
+                                <td className="ownercell">{owner.City}</td>
+                                <td className="ownercell">{owner.Name}</td>
+                                <td className="ownercell">{owner.Phone_No}</td>
+                                <td className="ownercell">{owner.State}</td>
+                                <td className="ownercell">{owner.Street}</td>
+                                <td className="ownercell">{owner.Type_of_owner}</td>
+                                <td className="ownercell">{owner.Zip}</td>
                                 <td className="ownercell">
                                         <span>
                                             <RiEdit2Line
@@ -318,18 +384,53 @@ const OwnerDetails = ({ children }) => {
                         </div>
                         <div className='form-group'>
                         
-                        <div className='floatleft'>Registration_number:</div>
-                          <input type="text" value={Registration_number} onChange={handleRegistration_number} className='floatright'/>
+                        <div className='floatleft'>City:</div>
+                          <input type="text" value={City} onChange={handleCity} className='floatright'/>
                         
                         </div>
                         <div className='form-group'>
                         
                             
-                        <div className='floatleft'>Purchase_date:</div>
-                          <input type="text" value={Purchase_date} onChange={handlePurchase_date} className='floatright'/>
+                        <div className='floatleft'>Name:</div>
+                          <input type="text" value={Name} onChange={handleName} className='floatright'/>
                         
                         </div>
-                        <div><button type="submit">Save</button></div>
+                        <div className='form-group'>
+                        
+                            
+                        <div className='floatleft'>Phone_No:</div>
+                          <input type="text" value={Phone_No} onChange={handlePhone_No} className='floatright'/>
+                        
+                        </div>
+                        <div className='form-group'>
+                        
+                            
+                        <div className='floatleft'>State:</div>
+                          <input type="text" value={State} onChange={handleState} className='floatright'/>
+                        
+                        </div>
+                        <div className='form-group'>
+                        
+                            
+                        <div className='floatleft'>Street:</div>
+                          <input type="text" value={Street} onChange={handleStreet} className='floatright'/>
+                        
+                        </div>
+                        <div className='form-group'>
+                        
+                            
+                        <div className='floatleft'>Type_of_owner:</div>
+                          <input type="text" value={Type_of_owner} onChange={handleType_of_owner} className='floatright'/>
+                        
+                        </div>
+                        <div className='form-group'>
+                        
+                            
+                        <div className='floatleft'>Zip:</div>
+                          <input type="text" value={Zip} onChange={handleZip} className='floatright'/>
+                        
+                        </div>
+                          <div><button type="submit">Save</button></div>
                       </form>
                     ) : null}
 
@@ -343,15 +444,50 @@ const OwnerDetails = ({ children }) => {
                         </div>
                         <div className='form-group'>
                         
-                        <div className='floatleft'>Registration_number:</div>
-                          <input type="text" value={Registration_number} onChange={handleRegistration_numberAdd} className='floatright'/>
+                        <div className='floatleft'>City:</div>
+                          <input type="text" value={City} onChange={handleCityAdd} className='floatright'/>
                         
                         </div>
                         <div className='form-group'>
                         
                             
-                        <div className='floatleft'>Purchase_date:</div>
-                          <input type="text" value={Purchase_date} onChange={handlePurchase_dateAdd} className='floatright'/>
+                        <div className='floatleft'>Name:</div>
+                          <input type="text" value={Name} onChange={handleNameAdd} className='floatright'/>
+                        
+                        </div>
+                        <div className='form-group'>
+                        
+                            
+                        <div className='floatleft'>Phone_No:</div>
+                          <input type="text" value={Phone_No} onChange={handlePhone_NoAdd} className='floatright'/>
+                        
+                        </div>
+                        <div className='form-group'>
+                        
+                            
+                        <div className='floatleft'>State:</div>
+                          <input type="text" value={State} onChange={handleStateAdd} className='floatright'/>
+                        
+                        </div>
+                        <div className='form-group'>
+                        
+                            
+                        <div className='floatleft'>Street:</div>
+                          <input type="text" value={Street} onChange={handleStreetAdd} className='floatright'/>
+                        
+                        </div>
+                        <div className='form-group'>
+                        
+                            
+                        <div className='floatleft'>Type_of_owner:</div>
+                          <input type="text" value={Type_of_owner} onChange={handleType_of_ownerAdd} className='floatright'/>
+                        
+                        </div>
+                        <div className='form-group'>
+                        
+                            
+                        <div className='floatleft'>Zip:</div>
+                          <input type="text" value={Zip} onChange={handleZipAdd} className='floatright'/>
                         
                         </div>
                         <div><button type="submit">Save</button></div>
