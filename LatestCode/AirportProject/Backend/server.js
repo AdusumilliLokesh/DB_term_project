@@ -18,6 +18,31 @@ const pool = mysql.createPool(dbConfig);
 app.use(cors());
 app.use(express.json()); 
 
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+      const connection = await mysql.createConnection(dbConfig);
+      const [rows] = await connection.execute(
+          'SELECT * FROM users WHERE username = ? AND password = ?',
+          [username, password]
+      );
+      connection.end();
+
+      if (rows.length > 0) {
+          // login successful
+          res.send({ success: true });
+      } else {
+          // login failed
+          res.send({ success: false });
+      }
+  } catch (err) {
+      // handle error
+      console.error(err);
+      res.status(500).send({ success: false });
+  }
+});
+
 app.get('/getTypeOfPlane', async (req, res) => {
   try {
     const connection = await pool.getConnection();
