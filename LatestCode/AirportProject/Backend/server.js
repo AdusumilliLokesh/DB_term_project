@@ -640,7 +640,7 @@ app.post('/search/typeOfPlane', async (req, res) => {
     res.status(500).json({ error: 'An error occurred while searching the type_of_plane table.' });
   }
 });
-app.post('/search/owners', async (req, res) => {
+app.post('/search/owns', async (req, res) => {
   const { column, value } = req.body;
 
   try {
