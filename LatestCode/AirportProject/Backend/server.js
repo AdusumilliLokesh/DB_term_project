@@ -1,6 +1,7 @@
 const express = require('express');
 const mysql = require('mysql2/promise');
 const cors = require('cors'); 
+const bcrypt = require('bcrypt');
 
 const app = express();
 const port = 5000;
@@ -21,28 +22,35 @@ app.use(cors(
 app.use(express.json()); 
 
 app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
+    const { username, password } = req.body;
 
-  try {
-      const connection = await mysql.createConnection(dbConfig);
-      const [rows] = await connection.execute(
-          'SELECT * FROM users WHERE username = ? AND password = ?',
-          [username, password]
-      );
-      connection.end();
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const [rows] = await connection.execute(
+            'SELECT * FROM users WHERE username = ?',
+            [username]
+        );
+        connection.end();
 
-      if (rows.length > 0) {
-          // login successful
-          res.send({ success: true });
-      } else {
-          // login failed
-          res.send({ success: false });
-      }
-  } catch (err) {
-      // handle error
-      console.error(err);
-      res.status(500).send({ success: false });
-  }
+        if (rows.length > 0) {
+            // Compare entered password with hashed password stored in database
+            const isMatch = await bcrypt.compare(password, rows[0].password);
+            if (isMatch) {
+                // Passwords match, login successful
+                res.send({ success: true });
+            } else {
+                // Passwords don't match, login failed
+                res.send({ success: false });
+            }
+        } else {
+            // No user found with provided username, login failed
+            res.send({ success: false });
+        }
+    } catch (err) {
+        // Handle error
+        console.error(err);
+        res.status(500).send({ success: false });
+    }
 });
 
 app.get('/getTypeOfPlane', async (req, res) => {
