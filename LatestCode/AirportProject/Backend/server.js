@@ -19,7 +19,6 @@ app.use(cors(
 
 ));
 app.use(express.json()); 
-
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
@@ -44,6 +43,7 @@ app.post('/login', async (req, res) => {
       res.status(500).send({ success: false });
   }
 });
+
 
 app.get('/getTypeOfPlane', async (req, res) => {
   try {
